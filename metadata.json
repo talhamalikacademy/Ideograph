@@ -1,0 +1,5 @@
+{
+  "name": "Ideograph",
+  "description": "An AI Scriptwriting Studio that mimics top creators and analyzes script virality using Gemini models.",
+  "requestFramePermissions": []
+}
