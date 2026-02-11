@@ -2,19 +2,23 @@
 import React, { useState } from 'react';
 import { ScriptData, CreatorProfile, YoutubeTitle } from '../types';
 import { generateViralTitles, generateThumbnail } from '../services/geminiService';
+import { ThumbnailEngine } from '../creator-intelligence/ThumbnailEngine';
 import { Sparkles, Image as ImageIcon, Copy, RefreshCw, X, Loader2, Globe, Type, Download, Check, MonitorPlay, Ratio } from 'lucide-react';
 import clsx from 'clsx';
 
 interface EngagementPanelProps {
   script: ScriptData;
   creator: CreatorProfile;
+  apiKey?: string;
 }
 
 type LangOption = 'English' | 'Urdu/Hindi' | 'Hinglish';
 type AspectOption = '16:9' | '9:16' | '1:1' | '4:3' | '3:4';
 
-const EngagementPanel: React.FC<EngagementPanelProps> = ({ script, creator }) => {
+const EngagementPanel: React.FC<EngagementPanelProps> = ({ script, creator, apiKey }) => {
   const [activeMode, setActiveMode] = useState<'none' | 'titles' | 'thumbnail'>('none');
+  const hasApiKey = Boolean(apiKey || process.env.API_KEY);
+  const thumbnailProfile = ThumbnailEngine.getProfile(creator.id);
   
   // Title State
   const [titles, setTitles] = useState<YoutubeTitle[]>([]);
@@ -41,11 +45,15 @@ const EngagementPanel: React.FC<EngagementPanelProps> = ({ script, creator }) =>
   };
 
   const generateTitles = async (lang: LangOption) => {
+    if (!hasApiKey) {
+        alert("API key is required. Open Settings and add your Gemini API key.");
+        return;
+    }
     setShowTitleLangModal(false);
     setActiveMode('titles');
     setIsGeneratingTitles(true);
     try {
-        const results = await generateViralTitles(script, creator, lang);
+        const results = await generateViralTitles(script, creator, lang, apiKey);
         setTitles(results);
         // Pre-fill thumbnail text
         if (results.length > 0) setThumbText(results[0].thumbnailText);
@@ -70,6 +78,10 @@ const EngagementPanel: React.FC<EngagementPanelProps> = ({ script, creator }) =>
   };
 
   const generateThumb = async (lang: LangOption) => {
+    if (!hasApiKey) {
+        alert("API key is required. Open Settings and add your Gemini API key.");
+        return;
+    }
     setShowThumbConfigModal(false);
     setActiveMode('thumbnail');
     setIsGeneratingThumb(true);
@@ -77,7 +89,7 @@ const EngagementPanel: React.FC<EngagementPanelProps> = ({ script, creator }) =>
     const overlay = thumbText || script.topic.substring(0, 25);
 
     try {
-        const url = await generateThumbnail(script, creator, overlay, lang, selectedAspectRatio);
+        const url = await generateThumbnail(script, creator, overlay, lang, selectedAspectRatio, apiKey);
         setThumbnailUrl(url);
     } catch (e) {
         console.error(e);
@@ -173,6 +185,12 @@ const EngagementPanel: React.FC<EngagementPanelProps> = ({ script, creator }) =>
                       </div>
                   </button>
               </div>
+              
+              {!hasApiKey && (
+                  <div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                      Thumbnail Engine requires an API key. Add it in Settings to generate titles and thumbnails.
+                  </div>
+              )}
 
               {/* DYNAMIC RESULTS AREA */}
               {(activeMode !== 'none' || isGeneratingTitles || isGeneratingThumb) && (
@@ -236,6 +254,11 @@ const EngagementPanel: React.FC<EngagementPanelProps> = ({ script, creator }) =>
                                       <div className="flex flex-wrap gap-2">
                                           <span className="text-xs bg-black/40 px-3 py-1.5 rounded-lg text-slate-300 border border-white/5">{creator.name}</span>
                                           <span className="text-xs bg-black/40 px-3 py-1.5 rounded-lg text-slate-300 border border-white/5">{selectedAspectRatio}</span>
+                                      </div>
+                                      <div className="mt-4 space-y-2 text-xs text-slate-400">
+                                          <p><span className="text-slate-500">DNA:</span> {thumbnailProfile.visualDNA}</p>
+                                          <p><span className="text-slate-500">Palette:</span> {thumbnailProfile.dominantColors}</p>
+                                          <p><span className="text-slate-500">Composition:</span> {thumbnailProfile.composition}</p>
                                       </div>
                                   </div>
                                   <button onClick={() => setShowThumbConfigModal(true)} className="w-full py-4 rounded-2xl border border-white/10 text-slate-300 font-bold hover:bg-white/5 transition-colors flex items-center justify-center gap-2">

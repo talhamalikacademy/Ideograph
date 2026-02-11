@@ -338,7 +338,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({
             )}
 
             {/* ENGAGEMENT COMMAND CENTER - Positioned at Bottom */}
-            <EngagementPanel script={script} creator={creator} />
+            <EngagementPanel script={script} creator={creator} apiKey={apiKey} />
             
         </div>
         

@@ -207,9 +207,9 @@ const CreationForm: React.FC<CreationFormProps> = ({
       <div className="text-center mb-12 relative z-10">
         <h2 className={clsx(
             "text-5xl md:text-7xl font-black mb-4 tracking-tighter bg-clip-text text-transparent bg-gradient-to-r animate-gradient",
-            isDarkMode ? "from-white via-indigo-300 to-white" : "from-slate-900 via-indigo-600 to-slate-900"
-        )} style={{ backgroundSize: '200% auto' }}>
-          What Do You Want to Create?
+            isDarkMode ? "from-white via-indigo-700 to-white" : "from-slate-900 via-indigo-600 to-slate-900"
+        )} style={{ backgroundSize: '50% auto' }}>
+           Start Your Masterpiece
         </h2>
         <p className={clsx(
             "text-xl md:text-2xl font-medium max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 delay-200 duration-1000",
