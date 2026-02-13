@@ -129,7 +129,6 @@ export interface ProductionScene {
 
 export interface DirectorPlan {
   scenes: ProductionScene[];
-  thumbnails: { description: string; textOverlay: string; score: number }[];
   editingNotes: string;
   musicMood: string;
 }
@@ -283,6 +282,5 @@ export interface YoutubeTitle {
   text: string;
   ctrScore: number;
   pattern: 'Explanation' | 'Investigation' | 'Curiosity' | 'Shock' | 'List';
-  thumbnailText: string;
   reasoning: string;
 }

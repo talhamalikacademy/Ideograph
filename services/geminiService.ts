@@ -4,7 +4,6 @@ import { CreatorProfile, ScriptData, AnalysisData, GeneratorConfig, Citation, Ho
 import { CREATORS, DURATION_MAPPING } from "../constants";
 import { AutoChooser } from "../creator-intelligence/AutoChooser";
 import { CreatorBlender } from "../creator-intelligence/CreatorBlender";
-import { ThumbnailEngine } from "../creator-intelligence/ThumbnailEngine";
 
 // Helper for delay
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -159,7 +158,6 @@ const viralTitlesSchema: Schema = {
                     text: { type: Type.STRING },
                     ctrScore: { type: Type.NUMBER },
                     pattern: { type: Type.STRING, enum: ['Explanation', 'Investigation', 'Curiosity', 'Shock', 'List'] },
-                    thumbnailText: { type: Type.STRING },
                     reasoning: { type: Type.STRING }
                 }
             }
@@ -227,7 +225,6 @@ const directorPlanSchema: Schema = {
     type: Type.OBJECT,
     properties: {
         scenes: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, timeStart: { type: Type.STRING }, duration: { type: Type.STRING }, cameraDirection: { type: Type.STRING }, audioCue: { type: Type.STRING }, visualPrompt: { type: Type.STRING }, onScreenText: { type: Type.STRING } } } },
-        thumbnails: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { description: { type: Type.STRING }, textOverlay: { type: Type.STRING }, score: { type: Type.NUMBER } } } },
         editingNotes: { type: Type.STRING },
         musicMood: { type: Type.STRING }
     }
@@ -625,50 +622,6 @@ export const generateViralTitles = async (
     const response = await retryWithBackoff<GenerateContentResponse>(operation, 2, 2000);
     const json = parseJSON(response.text || "{}");
     return json.titles || [];
-};
-
-export const generateThumbnail = async (
-    script: ScriptData,
-    creator: CreatorProfile,
-    textOverlay: string,
-    languageMode: string,
-    aspectRatio: string,
-    apiKey?: string
-): Promise<string> => {
-    const key = apiKey || process.env.API_KEY;
-    if (!key) throw new Error("No API Key");
-    const genAI = new GoogleGenAI({ apiKey: key });
-
-    // Use the Creator Thumbnail Style Database Engine
-    const imagePrompt = ThumbnailEngine.constructPrompt(creator, script.topic, textOverlay, languageMode, aspectRatio);
-
-    const validAspectRatios = ["16:9", "9:16", "1:1", "4:3", "3:4"];
-    const ratio = validAspectRatios.includes(aspectRatio) ? aspectRatio : "16:9";
-
-    const operation = async () => {
-        const response = await genAI.models.generateContent({
-            model: "gemini-3-pro-image-preview", // High quality image gen
-            contents: { parts: [{ text: imagePrompt }] },
-            config: {
-                imageConfig: {
-                    aspectRatio: ratio,
-                    imageSize: "1K"
-                }
-            }
-        });
-        
-        const parts = response.candidates?.[0]?.content?.parts;
-        if (parts) {
-            for (const part of parts) {
-                if (part.inlineData && part.inlineData.data) {
-                    return `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`;
-                }
-            }
-        }
-        throw new Error("No image generated.");
-    };
-
-    return await retryWithBackoff(operation, 2, 2000);
 };
 
 export const analyzeScriptWithGemini = async (script: ScriptData, apiKey?: string): Promise<AnalysisData> => {

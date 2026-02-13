@@ -58,7 +58,7 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ data }) => {
 
       <div className="p-4 rounded-xl bg-slate-100 dark:bg-white/5 border border-dashed dark:border-white/10 text-center">
           <p className="text-[10px] opacity-60 mb-2">
-              Connect YouTube Analytics to run live A/B tests on thumbnails and titles.
+              Connect YouTube Analytics to run live A/B tests on titles.
           </p>
           <button className="text-xs font-bold text-indigo-500 hover:underline">
               Connect Account

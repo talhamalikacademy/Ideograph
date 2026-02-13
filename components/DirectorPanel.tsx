@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { DirectorPlan } from '../types';
-import { Film, Music, Image, Scissors, Clock } from 'lucide-react';
-import clsx from 'clsx';
+import { Film, Music, Scissors, Clock } from 'lucide-react';
 
 interface DirectorPanelProps {
   data: DirectorPlan;
@@ -57,26 +56,6 @@ const DirectorPanel: React.FC<DirectorPanelProps> = ({ data }) => {
           </div>
       </div>
 
-      {/* Thumbnails */}
-      <div>
-          <h4 className="text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2">
-              <Image size={14} /> Thumbnail Concepts
-          </h4>
-          <div className="space-y-3">
-              {data.thumbnails.map((thumb, i) => (
-                  <div key={i} className="p-3 rounded-xl border dark:border-white/5 bg-white dark:bg-white/5">
-                      <div className="flex justify-between items-center mb-2">
-                          <span className="text-[10px] font-bold opacity-50">Option {i + 1}</span>
-                          <span className="text-[10px] font-bold text-green-500">Score: {thumb.score}</span>
-                      </div>
-                      <p className="text-xs mb-2">{thumb.description}</p>
-                      <div className="text-xs font-black uppercase text-center bg-black/20 p-2 rounded">
-                          {thumb.textOverlay}
-                      </div>
-                  </div>
-              ))}
-          </div>
-      </div>
     </div>
   );
 };
